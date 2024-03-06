@@ -1,0 +1,35 @@
+package main
+
+import (
+    "os/exec"
+    "testing"
+)
+
+func TestLoginAndExecuteOSPFCommand(t *testing.T) {
+    // Command to login into container and access router
+    containerName := "clab-frrlab-router2"
+    loginCmd := exec.Command("sudo", "docker", "exec", "-it", containerName, "/bin/bash")
+
+    // Execute login command
+    if err := loginCmd.Run(); err != nil {
+        t.Errorf("Failed to execute login command: %v", err)
+        return
+    }
+
+    // After logging in, execute OSPF command
+    ospfCommand := "vtysh -c 'router ospf' -c 'show ip ospf interface'"
+    cmd := exec.Command("sudo", "docker", "exec", containerName, "/bin/bash", "-c", ospfCommand)
+
+    // Execute OSPF command
+    output, err := cmd.CombinedOutput()
+    if err != nil {
+        t.Errorf("Failed to execute OSPF command: %v", err)
+        return
+    }
+
+    // Check if the output contains expected OSPF information
+    expectedOutput := "OSPF router id"
+    if !strings.Contains(string(output), expectedOutput) {
+        t.Errorf("OSPF command did not return expected output")
+    }
+}
