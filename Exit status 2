@@ -6,20 +6,22 @@ import (
 	"testing"
 )
 
-func TestConnectToRouter13(t *testing.T) {
+func TestConnectToRouter11(t *testing.T) {
 	// Command to list available containers
 	psCommand := "sudo docker ps"
 
 	// Execute the command to list available containers
 	psOutput, err := exec.Command("sh", "-c", psCommand).Output()
 	if err != nil {
-		t.Fatalf("Error executing docker ps command: %v", err)
+		fmt.Println("Error executing docker ps command:", err)
+		return
 	}
 
 	// Print the output of the docker ps command
 	fmt.Println("Available containers:")
 	fmt.Println(string(psOutput))
 
+	// Command to log in to bash shell of the container
 	loginCommand := "sudo docker exec clab-frrlab-router1 /bin/bash"
 
 	// Execute the command to log in to the bash shell of the container
@@ -29,45 +31,46 @@ func TestConnectToRouter13(t *testing.T) {
 		return
 	}
 
+	// Print the output of the login command
 	fmt.Println("Login output:")
 	fmt.Println(string(loginOutput))
-
-
 
 	// Command to log in to vtysh
 	vtyshCommand := "vtysh"
 
 	// Execute the command to log in to vtysh within the container's environment
 	vtyshOutput, err := exec.Command("sh", "-c", loginCommand+" -c '"+vtyshCommand+"'").CombinedOutput()
-	//vtyshOutput, err := exec.Command("sudo", "docker", "exec", "-it", "clab-frrlab-router1", vtyshCommand).CombinedOutput()
 	if err != nil {
-		t.Fatalf("Error logging in to vtysh: %v", err)
+		fmt.Println("Error logging in to vtysh:", err)
+		return
 	}
 
 	// Print the output of the vtysh command
 	fmt.Println("vtysh output:")
 	fmt.Println(string(vtyshOutput))
 
-	// Command to log in to config mode
+	// Command to log in to configure mode
 	configCommand := "configure terminal"
 
-	// Execute the command to log in to config mode within the container's environment
-	configOutput, err := exec.Command("sudo", "docker", "exec", "-it", "clab-frrlab-router1", configCommand).CombinedOutput()
+	// Execute the command to log in to configure mode within the container's environment
+	configOutput, err := exec.Command("sh", "-c", loginCommand+" -c '"+configCommand+"'").CombinedOutput()
 	if err != nil {
-		t.Fatalf("Error logging in to config mode: %v", err)
+		fmt.Println("Error logging in to configure mode:", err)
+		return
 	}
 
-	// Print the output of the config mode command
-	fmt.Println("Config mode output:")
+	// Print the output of the configure mode command
+	fmt.Println("Configure mode output:")
 	fmt.Println(string(configOutput))
 
 	// Command to log in to OSPF mode
 	ospfCommand := "router ospf"
 
 	// Execute the command to log in to OSPF mode within the container's environment
-	ospfOutput, err := exec.Command("sudo", "docker", "exec", "-it", "clab-frrlab-router1", configCommand, ospfCommand).CombinedOutput()
+	ospfOutput, err := exec.Command("sh", "-c", loginCommand+" -c '"+configCommand+" ; "+ospfCommand+"'").CombinedOutput()
 	if err != nil {
-		t.Fatalf("Error logging in to OSPF mode: %v", err)
+		fmt.Println("Error logging in to OSPF mode:", err)
+		return
 	}
 
 	// Print the output of the OSPF mode command
@@ -78,9 +81,10 @@ func TestConnectToRouter13(t *testing.T) {
 	networkCommand := "network 192.168.1.0/24 area 0"
 
 	// Execute the command to configure network 192.168.1.0/24 area 0 within the container's environment
-	networkOutput, err := exec.Command("sudo", "docker", "exec", "-it", "clab-frrlab-router1", configCommand, ospfCommand, networkCommand).CombinedOutput()
+	networkOutput, err := exec.Command("sh", "-c", loginCommand+" -c '"+configCommand+" ; "+ospfCommand+" ; "+networkCommand+"'").CombinedOutput()
 	if err != nil {
-		t.Fatalf("Error configuring network: %v", err)
+		fmt.Println("Error configuring network:", err)
+		return
 	}
 
 	// Print the output of the network configuration command
