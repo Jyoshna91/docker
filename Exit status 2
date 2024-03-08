@@ -51,8 +51,11 @@ func TestConnectToRouter11(t *testing.T) {
 	fmt.Println("Configuration output:")
 	fmt.Println(string(configOutput))
 
+	// Specify the full path to the vtysh command
+	vtyshPath := "/usr/bin/vtysh"
+
 	// Command to show OSPF neighbors
-	showNeighborsCommand := "/usr/bin/vtysh -c 'show ip ospf neighbor'"
+	showNeighborsCommand := vtyshPath + " -c 'show ip ospf neighbor'"
 
 	// Execute the command to show OSPF neighbors within the container's environment
 	showNeighborsOutput, err := exec.Command("sh", "-c", loginCommand+" -c '"+showNeighborsCommand+"'").CombinedOutput()
