@@ -1,0 +1,70 @@
+package main
+
+import (
+	"fmt"
+	"os/exec"
+)
+
+func main() {
+	// Command to list available Docker containers
+	cmd := exec.Command("sudo", "docker", "ps")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error listing Docker containers:", err)
+		return
+	}
+	fmt.Println("Available Docker containers:")
+	fmt.Println(string(output))
+
+	// Command to login to bash of a container
+	cmd = exec.Command("sudo", "docker", "exec", "-it", "clab-frrlab-router1", "/bin/bash")
+	// Uncomment below line to automatically log into vtysh and config
+	// cmd = exec.Command("sudo", "docker", "exec", "-it", "clab-frrlab-router1", "vtysh", "-c", "conf t")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error logging into container:", err)
+		return
+	}
+	fmt.Println("Logged into container bash:")
+	fmt.Println(string(output))
+
+	// Command to log into vtysh
+	cmd = exec.Command("vtysh")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error logging into vtysh:", err)
+		return
+	}
+	fmt.Println("Logged into vtysh:")
+	fmt.Println(string(output))
+
+	// Command to log into config mode
+	cmd = exec.Command("Config")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error logging into config mode:", err)
+		return
+	}
+	fmt.Println("Logged into config mode:")
+	fmt.Println(string(output))
+
+	// Command to log into router ospf
+	cmd = exec.Command("router", "ospf")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error logging into router ospf:", err)
+		return
+	}
+	fmt.Println("Logged into router ospf:")
+	fmt.Println(string(output))
+
+	// Command to show IP OSPF neighbors
+	cmd = exec.Command("do", "show", "ip", "ospf", "neighbor")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error executing show IP OSPF neighbor command:", err)
+		return
+	}
+	fmt.Println("Show IP OSPF neighbor output:")
+	fmt.Println(string(output))
+}
